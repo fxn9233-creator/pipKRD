@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ku">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>هەژمارکردنی بەهای پیپ لە فۆڕێکس</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+        direction: rtl;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        color: #2d3748;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .description {
+        background: linear-gradient(135deg, #f7fafc, #e2e8f0);
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        border-right: 4px solid #667eea;
+      }
+
+      .description h3 {
+        color: #2d3748;
+        margin-bottom: 10px;
+        font-size: 1.3em;
+      }
+
+      .description p {
+        color: #4a5568;
+        line-height: 1.6;
+        margin-bottom: 10px;
+      }
+
+      .warning {
+        background: linear-gradient(135deg, #fed7d7, #feb2b2);
+        color: #c53030;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        font-size: 0.9em;
+        border-right: 4px solid #e53e3e;
+      }
+
+      .form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+      }
+
+      .form-group label {
+        display: block;
+        color: #2d3748;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 1.1em;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1em;
+        transition: all 0.3s ease;
+        background: #f7fafc;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: white;
+      }
+
+      .currency-pairs {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .pair-button {
+        padding: 12px 15px;
+        background: linear-gradient(135deg, #f7fafc, #e2e8f0);
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        color: #4a5568;
+        text-align: center;
+      }
+
+      .pair-button:hover {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .pair-button.active {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-color: #667eea;
+      }
+
+      .calculate-btn {
+        background: linear-gradient(135deg, #48bb78, #38a169);
+        color: white;
+        padding: 18px 40px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.2em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 20px;
+      }
+
+      .calculate-btn:hover {
+        background: linear-gradient(135deg, #38a169, #2f855a);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
+      }
+
+      .result {
+        background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
+        padding: 25px;
+        border-radius: 15px;
+        margin-top: 20px;
+        text-align: center;
+        border-right: 4px solid #48bb78;
+        display: none;
+      }
+
+      .result h3 {
+        color: #22543d;
+        font-size: 1.5em;
+        margin-bottom: 10px;
+      }
+
+      .result p {
+        color: #2f855a;
+        font-size: 1.8em;
+        font-weight: bold;
+      }
+
+      .input-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px;
+          margin: 10px;
+        }
+
+        .header h1 {
+          font-size: 2em;
+        }
+
+        .input-group {
+          grid-template-columns: 1fr;
+        }
+
+        .currency-pairs {
+          grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        }
+      }
+
+      .icon {
+        font-size: 1.5em;
+        margin-left: 10px;
+      }
+
+      .footer {
+        margin-top: 30px;
+        background: linear-gradient(135deg, #2d3748, #4a5568);
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        color: white;
+      }
+
+      .copyright h4 {
+        color: #f7fafc;
+        margin-bottom: 15px;
+        font-size: 1.3em;
+      }
+
+      .brand {
+        margin-bottom: 20px;
+      }
+
+      .logo {
+        font-size: 2em;
+        font-weight: bold;
+        background: linear-gradient(45deg, #ffd700, #ff6b6b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 15px;
+      }
+
+      .social-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+      }
+
+      .social-link.telegram {
+        background: linear-gradient(135deg, #0088cc, #0066aa);
+      }
+
+      .social-link.tiktok {
+        background: linear-gradient(135deg, #ff0050, #000000);
+      }
+
+      .social-link.instagram {
+        background: linear-gradient(
+          135deg,
+          #f56040,
+          #833ab4,
+          #c13584,
+          #e1306c,
+          #fd1d1d
+        );
+      }
+
+      .social-link:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .social-link .icon {
+        font-size: 1.2em;
+        margin-left: 0;
+      }
+
+      @media (max-width: 768px) {
+        .social-links {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .social-link {
+          width: 200px;
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>📊 هەژمارکردنی بەهای پیپ لە فۆڕێکس</h1>
+      </div>
+
+      <div class="description">
+        <h3>🎯 ئەم ئامرازە بۆچی بەکاردێت؟</h3>
+        <p>
+          ئەم ئامرازە ڕێگەت پێدەدات بەهای پیپ بۆ هەر جووتە دراوێک بە پشتبەستن بە
+          قەبارەی لۆت و ژمارەی پیپەکان و ئەکاونتەکەت بە دۆلار حیسابی بکەیت.
+          بەهای پیپ بەپێی جووتەکە و قەبارەی بازرگانی دەگۆڕێت، و پێویستە بۆ
+          بەڕێوەبردنی وردی مەترسی.
+        </p>
+
+        <div class="warning">
+          <strong>⚠️ تێبینی:</strong> ئەمە وەشانی تاقیکاریە، دەکریت هەڵە هەبیت
+          لە هەژمارکردن و ئەم پەڕەیە بەردەوام نوێ دەکرێتەوە
+        </div>
+      </div>
+
+      <div class="form-container">
+        <div class="form-group">
+          <label>💰 جۆری دراوی هەژمارەکەت</label>
+          <select id="accountCurrency">
+            <option value="USD">USD - دۆلاری ئەمریکی</option>
+            <option value="EUR">EUR - یۆرۆ</option>
+            <option value="GBP">GBP - پاوەندی بەریتانی</option>
+            <option value="JPY">JPY - یەنی ژاپۆنی</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>📈 جووتەدراو</label>
+          <select id="currencyPair">
+            <option value="">جووتەکە هەڵبژێرە...</option>
+          </select>
+
+          <div class="currency-pairs">
+            <div class="pair-button" data-pair="EURUSD">EUR/USD</div>
+            <div class="pair-button" data-pair="GBPUSD">GBP/USD</div>
+            <div class="pair-button" data-pair="USDJPY">USD/JPY</div>
+            <div class="pair-button" data-pair="USDCHF">USD/CHF</div>
+            <div class="pair-button" data-pair="AUDUSD">AUD/USD</div>
+            <div class="pair-button" data-pair="USDCAD">USD/CAD</div>
+            <div class="pair-button" data-pair="NZDUSD">NZD/USD</div>
+            <div class="pair-button" data-pair="EURGBP">EUR/GBP</div>
+            <div class="pair-button" data-pair="EURJPY">EUR/JPY</div>
+            <div class="pair-button" data-pair="GBPJPY">GBP/JPY</div>
+            <div class="pair-button" data-pair="XAUUSD">XAU/USD</div>
+            <div class="pair-button" data-pair="XAGUSD">XAG/USD</div>
+            <div class="pair-button" data-pair="BTCUSD">BTC/USD</div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <div class="form-group">
+            <label>📦 قەبارەی بازرگانی (لۆت)</label>
+            <input
+              type="number"
+              id="lotSize"
+              step="0.01"
+              value="1"
+              placeholder="بۆ نموونە: 1.00"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>📊 ژمارەی پیپ (Pips)</label>
+            <input
+              type="number"
+              id="pips"
+              step="0.1"
+              value="10"
+              placeholder="بۆ نموونە: 10"
+            />
+          </div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculatePipValue()">
+          🧮 هەژمار کردن
+        </button>
+
+        <div id="result" class="result">
+          <h3>💵 بەهای پیپ</h3>
+          <p id="pipValue">$0.00</p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="copyright">
+          <h4>🌟 مافی ئەم بەرهەمە</h4>
+          <div class="brand">
+            <span class="logo">💎 NoraFX</span>
+          </div>
+          <div class="social-links">
+            <a
+              href="https://t.me/nooraafx"
+              target="_blank"
+              class="social-link telegram"
+            >
+              <span class="icon">📱</span>
+              <span>تیلگرام</span>
+            </a>
+            <a
+              href="https://www.tiktok.com/@nora.fx5?_t=ZS-8ywnvnGj7iC&_r=1"
+              target="_blank"
+              class="social-link tiktok"
+            >
+              <span class="icon">🎵</span>
+              <span>تیکتۆک</span>
+            </a>
+            <a
+              href="https://www.instagram.com/nora_fx_99?igsh=emJzd3h2dTJhc3Fi&utm_source=qr"
+              target="_blank"
+              class="social-link instagram"
+            >
+              <span class="icon">📸</span>
+              <span>ئینستاگرام</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Currency pairs data with approximate exchange rates (for demo purposes)
+      const currencyPairs = {
+        EURUSD: { rate: 1.085, type: "major" },
+        GBPUSD: { rate: 1.265, type: "major" },
+        USDJPY: { rate: 149.5, type: "major" },
+        USDCHF: { rate: 0.889, type: "major" },
+        AUDUSD: { rate: 0.658, type: "major" },
+        USDCAD: { rate: 1.352, type: "major" },
+        NZDUSD: { rate: 0.612, type: "major" },
+        EURGBP: { rate: 0.858, type: "cross" },
+        EURJPY: { rate: 162.2, type: "cross" },
+        GBPJPY: { rate: 189.1, type: "cross" },
+        XAUUSD: { rate: 2450.0, type: "commodity" },
+        XAGUSD: { rate: 28.5, type: "commodity" },
+        BTCUSD: { rate: 67000.0, type: "crypto" },
+      };
+
+      // Populate currency pair select
+      const currencySelect = document.getElementById("currencyPair");
+      Object.keys(currencyPairs).forEach((pair) => {
+        const option = document.createElement("option");
+        option.value = pair;
+        option.textContent = pair;
+        currencySelect.appendChild(option);
+      });
+
+      // Handle pair button clicks
+      document.querySelectorAll(".pair-button").forEach((button) => {
+        button.addEventListener("click", function () {
+          document
+            .querySelectorAll(".pair-button")
+            .forEach((btn) => btn.classList.remove("active"));
+          this.classList.add("active");
+          document.getElementById("currencyPair").value = this.dataset.pair;
+        });
+      });
+
+      // Update select when pair button is clicked
+      document
+        .getElementById("currencyPair")
+        .addEventListener("change", function () {
+          document.querySelectorAll(".pair-button").forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.pair === this.value);
+          });
+        });
+
+      function calculatePipValue() {
+        const accountCurrency =
+          document.getElementById("accountCurrency").value;
+        const currencyPair = document.getElementById("currencyPair").value;
+        const lotSize = parseFloat(document.getElementById("lotSize").value);
+        const pips = parseFloat(document.getElementById("pips").value);
+
+        if (!currencyPair || !lotSize || !pips) {
+          alert("تکایە هەموو خانەکان پڕ بکەرەوە!");
+          return;
+        }
+
+        // Standard lot size is 100,000 units
+        const standardLot = 100000;
+        const units = lotSize * standardLot;
+
+        let pipValue = 0;
+        const pair = currencyPairs[currencyPair];
+
+        // Calculate pip value based on currency pair type
+        if (currencyPair.endsWith("USD")) {
+          // Quote currency is USD
+          pipValue = units * 0.0001 * pips;
+        } else if (currencyPair.startsWith("USD")) {
+          // Base currency is USD
+          pipValue = (units * 0.0001 * pips) / pair.rate;
+        } else {
+          // Cross currency pairs
+          pipValue = units * 0.0001 * pips * pair.rate;
+        }
+
+        // Special handling for JPY pairs (2 decimal places instead of 4)
+        if (currencyPair.includes("JPY")) {
+          pipValue = pipValue * 100;
+        }
+
+        // Handle commodities and crypto with different pip values
+        if (currencyPair === "XAUUSD" || currencyPair === "XAGUSD") {
+          pipValue = units * 0.01 * pips;
+        } else if (currencyPair === "BTCUSD") {
+          pipValue = units * 1 * pips;
+        }
+
+        // Convert to account currency if needed (simplified conversion)
+        if (accountCurrency !== "USD") {
+          const conversionRates = {
+            EUR: 0.92,
+            GBP: 0.79,
+            JPY: 149.5,
+          };
+          if (conversionRates[accountCurrency]) {
+            pipValue = pipValue * conversionRates[accountCurrency];
+          }
+        }
+
+        // Display result
+        const resultDiv = document.getElementById("result");
+        const pipValueElement = document.getElementById("pipValue");
+
+        const currency = accountCurrency === "JPY" ? "¥" : "$";
+        pipValueElement.textContent = `${currency}${pipValue.toFixed(2)}`;
+        resultDiv.style.display = "block";
+
+        // Smooth scroll to result
+        resultDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      // Add some interactive effects
+      document.querySelectorAll("input, select").forEach((element) => {
+        element.addEventListener("focus", function () {
+          this.parentElement.style.transform = "scale(1.02)";
+          this.parentElement.style.transition = "transform 0.2s ease";
+        });
+
+        element.addEventListener("blur", function () {
+          this.parentElement.style.transform = "scale(1)";
+        });
+      });
+    </script>
+  </body>
+</html>
